@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { SiteSettings, SiteSetting } from '../types';
+import { SiteSettings } from '../types';
 
 export const useSiteSettings = () => {
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
@@ -24,8 +24,11 @@ export const useSiteSettings = () => {
         site_name: data.find(s => s.id === 'site_name')?.value || 'Beracah Cafe',
         site_logo: data.find(s => s.id === 'site_logo')?.value || '',
         site_description: data.find(s => s.id === 'site_description')?.value || '',
-        currency: data.find(s => s.id === 'currency')?.value || 'PHP',
-        currency_code: data.find(s => s.id === 'currency_code')?.value || 'PHP'
+        currency: data.find(s => s.id === 'currency')?.value || '₱',
+        currency_code: data.find(s => s.id === 'currency_code')?.value || 'PHP',
+        opening_time: data.find(s => s.id === 'opening_time')?.value || '08:00',
+        closing_time: data.find(s => s.id === 'closing_time')?.value || '22:00',
+        is_temporarily_closed: (data.find(s => s.id === 'is_temporarily_closed')?.value === 'true')
       };
 
       setSiteSettings(settings);
@@ -64,12 +67,12 @@ export const useSiteSettings = () => {
       const updatePromises = Object.entries(updates).map(([key, value]) =>
         supabase
           .from('site_settings')
-          .update({ value })
+          .update({ value: String(value) })
           .eq('id', key)
       );
 
       const results = await Promise.all(updatePromises);
-      
+
       // Check for errors
       const errors = results.filter(result => result.error);
       if (errors.length > 0) {

@@ -11,7 +11,10 @@ const SiteSettingsManager: React.FC = () => {
     site_name: '',
     site_description: '',
     currency: '',
-    currency_code: ''
+    currency_code: '',
+    opening_time: '',
+    closing_time: '',
+    is_temporarily_closed: false
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
@@ -22,7 +25,10 @@ const SiteSettingsManager: React.FC = () => {
         site_name: siteSettings.site_name,
         site_description: siteSettings.site_description,
         currency: siteSettings.currency,
-        currency_code: siteSettings.currency_code
+        currency_code: siteSettings.currency_code,
+        opening_time: siteSettings.opening_time,
+        closing_time: siteSettings.closing_time,
+        is_temporarily_closed: siteSettings.is_temporarily_closed
       });
       setLogoPreview(siteSettings.site_logo);
     }
@@ -51,10 +57,10 @@ const SiteSettingsManager: React.FC = () => {
   const handleSave = async () => {
     try {
       let logoUrl = logoPreview;
-      
+
       // Upload new logo if selected
       if (logoFile) {
-        const uploadedUrl = await uploadImage(logoFile, 'site-logo');
+        const uploadedUrl = await uploadImage(logoFile);
         logoUrl = uploadedUrl;
       }
 
@@ -64,6 +70,9 @@ const SiteSettingsManager: React.FC = () => {
         site_description: formData.site_description,
         currency: formData.currency,
         currency_code: formData.currency_code,
+        opening_time: formData.opening_time,
+        closing_time: formData.closing_time,
+        is_temporarily_closed: formData.is_temporarily_closed,
         site_logo: logoUrl
       });
 
@@ -80,7 +89,10 @@ const SiteSettingsManager: React.FC = () => {
         site_name: siteSettings.site_name,
         site_description: siteSettings.site_description,
         currency: siteSettings.currency,
-        currency_code: siteSettings.currency_code
+        currency_code: siteSettings.currency_code,
+        opening_time: siteSettings.opening_time,
+        closing_time: siteSettings.closing_time,
+        is_temporarily_closed: siteSettings.is_temporarily_closed
       });
       setLogoPreview(siteSettings.site_logo);
     }
@@ -248,6 +260,76 @@ const SiteSettingsManager: React.FC = () => {
             ) : (
               <p className="text-lg font-medium text-black">{siteSettings?.currency_code}</p>
             )}
+          </div>
+        </div>
+
+        {/* Store Hours & Status */}
+        <div className="border-t pt-6 mt-6">
+          <h3 className="text-lg font-medium text-black mb-4">Store Hours & Availability</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Opening Time
+              </label>
+              {isEditing ? (
+                <input
+                  type="time"
+                  name="opening_time"
+                  value={formData.opening_time}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                />
+              ) : (
+                <p className="text-lg font-medium text-black">
+                  {new Date(`2000-01-01T${siteSettings?.opening_time}`).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Closing Time
+              </label>
+              {isEditing ? (
+                <input
+                  type="time"
+                  name="closing_time"
+                  value={formData.closing_time}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                />
+              ) : (
+                <p className="text-lg font-medium text-black">
+                  {new Date(`2000-01-01T${siteSettings?.closing_time}`).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div>
+                <h4 className="text-base font-medium text-black">Temporary Close</h4>
+                <p className="text-sm text-gray-500">
+                  Temporarily stop accepting orders (e.g., for emergency or maintenance)
+                </p>
+              </div>
+              {isEditing ? (
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_temporarily_closed}
+                    onChange={(e) => setFormData(prev => ({ ...prev, is_temporarily_closed: e.target.checked }))}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                </label>
+              ) : (
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${siteSettings?.is_temporarily_closed ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                  {siteSettings?.is_temporarily_closed ? 'Closed' : 'Open'}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>

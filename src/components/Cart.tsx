@@ -25,12 +25,15 @@ const Cart: React.FC<CartProps> = ({
     return (
       <div className="max-w-4xl mx-auto px-4 py-12">
         <div className="text-center py-16">
-          <div className="text-6xl mb-4">☕</div>
+          <div className="flex flex-col items-center mb-6">
+            <h1 className="font-playfair font-bold text-4xl tracking-wider text-iskina-dark">ISKINA PUSO</h1>
+            <span className="text-xs uppercase tracking-[0.3em] text-iskina-dark/80 mt-2">Street Food</span>
+          </div>
           <h2 className="text-2xl font-playfair font-medium text-black mb-2">Your cart is empty</h2>
           <p className="text-gray-600 mb-6">Add some delicious items to get started!</p>
           <button
             onClick={onContinueShopping}
-            className="bg-red-600 text-white px-6 py-3 rounded-full hover:bg-red-700 transition-all duration-200"
+            className="bg-iskina-green text-white px-6 py-3 rounded-full hover:bg-iskina-dark transition-all duration-200"
           >
             Browse Menu
           </button>
@@ -61,49 +64,49 @@ const Cart: React.FC<CartProps> = ({
 
       <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
         {cartItems.map((item, index) => (
-          <div key={item.id} className={`p-6 ${index !== cartItems.length - 1 ? 'border-b border-cream-200' : ''}`}>
+          <div key={item.id} className={`p-6 ${index !== cartItems.length - 1 ? 'border-b border-iskina-green/10' : ''}`}>
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <h3 className="text-lg font-noto font-medium text-black mb-1">{item.name}</h3>
+                <h3 className="text-lg font-noto font-medium text-iskina-dark mb-1">{item.name}</h3>
                 {item.selectedVariation && (
                   <p className="text-sm text-gray-500 mb-1">Size: {item.selectedVariation.name}</p>
                 )}
                 {item.selectedAddOns && item.selectedAddOns.length > 0 && (
                   <p className="text-sm text-gray-500 mb-1">
-                    Add-ons: {item.selectedAddOns.map(addOn => 
-                      addOn.quantity && addOn.quantity > 1 
+                    Add-ons: {item.selectedAddOns.map(addOn =>
+                      addOn.quantity && addOn.quantity > 1
                         ? `${addOn.name} x${addOn.quantity}`
                         : addOn.name
                     ).join(', ')}
                   </p>
                 )}
-                <p className="text-lg font-semibold text-black">₱{item.totalPrice} each</p>
+                <p className="text-lg font-semibold text-iskina-dark">₱{item.totalPrice} each</p>
               </div>
-              
+
               <div className="flex items-center space-x-4 ml-4">
-                <div className="flex items-center space-x-3 bg-yellow-100 rounded-full p-1">
+                <div className="flex items-center space-x-3 bg-iskina-gold/20 rounded-full p-1 border border-iskina-gold/30">
                   <button
                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                    className="p-2 hover:bg-yellow-200 rounded-full transition-colors duration-200"
+                    className="p-2 hover:bg-iskina-gold/40 rounded-full transition-colors duration-200"
                   >
-                    <Minus className="h-4 w-4" />
+                    <Minus className="h-4 w-4 text-iskina-dark" />
                   </button>
-                  <span className="font-semibold text-black min-w-[32px] text-center">{item.quantity}</span>
+                  <span className="font-semibold text-iskina-dark min-w-[32px] text-center">{item.quantity}</span>
                   <button
                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    className="p-2 hover:bg-yellow-200 rounded-full transition-colors duration-200"
+                    className="p-2 hover:bg-iskina-gold/40 rounded-full transition-colors duration-200"
                   >
-                    <Plus className="h-4 w-4" />
+                    <Plus className="h-4 w-4 text-iskina-dark" />
                   </button>
                 </div>
-                
+
                 <div className="text-right">
-                  <p className="text-lg font-semibold text-black">₱{item.totalPrice * item.quantity}</p>
+                  <p className="text-lg font-semibold text-iskina-dark">₱{item.totalPrice * item.quantity}</p>
                 </div>
-                
+
                 <button
                   onClick={() => removeFromCart(item.id)}
-                  className="p-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
+                  className="p-2 text-iskina-red hover:text-red-700 hover:bg-red-50 rounded-full transition-all duration-200"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -114,14 +117,14 @@ const Cart: React.FC<CartProps> = ({
       </div>
 
       <div className="bg-white rounded-xl shadow-sm p-6">
-        <div className="flex items-center justify-between text-2xl font-noto font-semibold text-black mb-6">
+        <div className="flex items-center justify-between text-2xl font-noto font-semibold text-iskina-dark mb-6">
           <span>Total:</span>
-          <span>₱{parseFloat(getTotalPrice() || 0).toFixed(2)}</span>
+          <span>₱{(getTotalPrice() || 0).toFixed(2)}</span>
         </div>
-        
+
         <button
           onClick={onCheckout}
-          className="w-full bg-red-600 text-white py-4 rounded-xl hover:bg-red-700 transition-all duration-200 transform hover:scale-[1.02] font-medium text-lg"
+          className="w-full bg-iskina-green text-white py-4 rounded-xl hover:bg-iskina-dark transition-all duration-200 transform hover:scale-[1.02] font-medium text-lg shadow-lg hover:shadow-xl"
         >
           Proceed to Checkout
         </button>

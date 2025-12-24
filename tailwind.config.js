@@ -4,16 +4,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        ramen: {
-          red: '#D7263D',
-          dark: '#0B0A0A',
-          charcoal: '#111113',
-          cream: '#FFF3E0',
-          beige: '#F7E7CE',
-          gold: '#E0A106',
-          sesame: '#D1C7B7',
-          seaweed: '#1F2937',
-          kimchi: '#B81D24'
+        iskina: {
+          green: '#006428',    // Deep Green background
+          market: '#32CD32',   // Bright Green accents
+          gold: '#FFD700',     // Yellow/Gold text
+          warm: '#FFF8E1',     // Light warm background
+          dark: '#0B2810',     // Very dark green text/footer
+          red: '#D7263D',      // Keeping detailed red for alerts/errors if needed
         }
       },
       fontFamily: {
