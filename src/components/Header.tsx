@@ -67,7 +67,7 @@ const Header: React.FC<HeaderProps> = ({ totalItems, openCart, handleNavClick, s
               </span>
               <span className={`text-[10px] uppercase tracking-[0.2em] ${isScrolled ? 'text-white/80' : 'text-iskina-dark/80'
                 }`}>
-                Street Food
+                One Stop Streetfood Shop
               </span>
             </div>
           </div>
