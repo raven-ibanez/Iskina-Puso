@@ -57,7 +57,7 @@ export interface OrderData {
   notes?: string;
 }
 
-export type PaymentMethod = 'gcash' | 'maya' | 'bank-transfer';
+export type PaymentMethod = 'gcash' | 'maya' | 'bank-transfer' | 'cod';
 export type ServiceType = 'dine-in' | 'pickup' | 'delivery' | 'room-service';
 
 // Site Settings Types

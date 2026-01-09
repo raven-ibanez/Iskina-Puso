@@ -18,13 +18,16 @@ const Checkout: React.FC<CheckoutProps> = ({ cartItems, totalPrice, onBack, init
   const [step, setStep] = useState<'details' | 'payment'>('details');
   const [customerName, setCustomerName] = useState('');
   const [contactNumber, setContactNumber] = useState('');
-  const [serviceType, setServiceType] = useState<ServiceType>('room-service');
+  const [serviceType, setServiceType] = useState<ServiceType>('dine-in');
   const [pickupTime, setPickupTime] = useState('5-10');
   const [customTime, setCustomTime] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('gcash');
   // const [referenceNumber, setReferenceNumber] = useState(''); // Removed unused state
   const [roomNumber, setRoomNumber] = useState(initialRoomNumber);
   const [notes, setNotes] = useState('');
+
+  const serviceCharge = serviceType === 'room-service' ? totalPrice * 0.05 : 0;
+  const finalTotal = totalPrice + serviceCharge;
 
   React.useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -37,7 +40,8 @@ const Checkout: React.FC<CheckoutProps> = ({ cartItems, totalPrice, onBack, init
     }
   }, [paymentMethods, paymentMethod]);
 
-  const selectedPaymentMethod = paymentMethods.find(method => method.id === paymentMethod);
+  const allPaymentMethods = [...paymentMethods, { id: 'cod', name: 'Cash on Delivery', account_number: '', account_name: '', qr_code_url: '', active: true, sort_order: 99 }];
+  const selectedPaymentMethod = allPaymentMethods.find(method => method.id === paymentMethod);
 
   const handleProceedToPayment = () => {
     // Check store availability
@@ -86,8 +90,8 @@ const Checkout: React.FC<CheckoutProps> = ({ cartItems, totalPrice, onBack, init
 
 👤 Customer: ${customerName}
 📞 Contact: ${contactNumber}
-${roomNumber ? `🏨 Room: ${roomNumber}` : ''}
-📍 Service: ${serviceType === 'room-service' ? 'Room Service' : 'Pickup'}
+${roomNumber ? `🏨 ${serviceType === 'dine-in' ? 'Table' : 'Room'}: ${roomNumber}` : ''}
+📍 Service: ${serviceType === 'dine-in' ? 'Dine In' : serviceType === 'room-service' ? 'Room Service' : 'Pickup'}
 ⏰ Service Time: ${timeInfo}
 
 
@@ -108,7 +112,9 @@ ${cartItems.map(item => {
       return itemDetails;
     }).join('\n')}
 
-💰 TOTAL: ₱${totalPrice}
+💰 SUBTOTAL: ₱${totalPrice}
+${serviceCharge > 0 ? `📉 SERVICE CHARGE (5%): ₱${serviceCharge.toFixed(2)}` : ''}
+💰 TOTAL: ₱${finalTotal.toFixed(2)}
 
 
 💳 Payment: ${selectedPaymentMethod?.name || paymentMethod}
@@ -180,10 +186,20 @@ Please confirm this order to proceed. Thank you for choosing Iskina Puso!
               ))}
             </div>
 
-            <div className="border-t border-iskina-green/20 pt-4">
+            <div className="border-t border-iskina-green/20 pt-4 space-y-2">
+              <div className="flex items-center justify-between text-lg text-gray-600">
+                <span>Subtotal:</span>
+                <span>₱{totalPrice}</span>
+              </div>
+              {serviceCharge > 0 && (
+                <div className="flex items-center justify-between text-lg text-iskina-dark">
+                  <span>Service Charge (5%):</span>
+                  <span>₱{serviceCharge.toFixed(2)}</span>
+                </div>
+              )}
               <div className="flex items-center justify-between text-2xl font-noto font-semibold text-black">
                 <span>Total:</span>
-                <span>₱{totalPrice}</span>
+                <span>₱{finalTotal.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -219,13 +235,15 @@ Please confirm this order to proceed. Thank you for choosing Iskina Puso!
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-black mb-2">Room Number *</label>
+                <label className="block text-sm font-medium text-black mb-2">
+                  {serviceType === 'dine-in' ? 'Table Number *' : 'Room Number *'}
+                </label>
                 <input
                   type="text"
                   value={roomNumber}
                   onChange={(e) => setRoomNumber(e.target.value)}
                   className="w-full px-4 py-3 border border-iskina-green/30 rounded-lg focus:ring-2 focus:ring-iskina-green focus:border-transparent transition-all duration-200"
-                  placeholder="Enter room number"
+                  placeholder={serviceType === 'dine-in' ? "Enter table number" : "Enter room number"}
                   required
                 />
               </div>
@@ -235,6 +253,7 @@ Please confirm this order to proceed. Thank you for choosing Iskina Puso!
                 <label className="block text-sm font-medium text-black mb-3">Service Type *</label>
                 <div className="grid grid-cols-2 gap-3">
                   {[
+                    { value: 'dine-in', label: 'Dine In', icon: '🍽️' },
                     { value: 'pickup', label: 'Pickup', icon: '🚶' },
                     { value: 'room-service', label: 'Room Service', icon: '🛎️' }
                   ].map((option) => (
@@ -257,7 +276,7 @@ Please confirm this order to proceed. Thank you for choosing Iskina Puso!
               {/* Service Time Selection */}
               <div>
                 <label className="block text-sm font-medium text-black mb-3">
-                  {serviceType === 'room-service' ? 'Preferred Service Time *' : 'Pickup Time *'}
+                  {serviceType === 'dine-in' ? 'Preferred Dining Time *' : serviceType === 'room-service' ? 'Preferred Service Time *' : 'Pickup Time *'}
                 </label>
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3">
@@ -288,7 +307,7 @@ Please confirm this order to proceed. Thank you for choosing Iskina Puso!
                       value={customTime}
                       onChange={(e) => setCustomTime(e.target.value)}
                       className="w-full px-4 py-3 border border-iskina-green/30 rounded-lg focus:ring-2 focus:ring-iskina-green focus:border-transparent transition-all duration-200"
-                      placeholder={serviceType === 'room-service' ? "e.g., 8:00 AM, In 45 mins" : "e.g., 45 minutes, 1 hour, 2:30 PM"}
+                      placeholder={serviceType === 'dine-in' ? "e.g., 12:30 PM, In 15 mins" : serviceType === 'room-service' ? "e.g., 8:00 AM, In 45 mins" : "e.g., 45 minutes, 1 hour, 2:30 PM"}
                       required
                     />
                   )}
@@ -346,7 +365,7 @@ Please confirm this order to proceed. Thank you for choosing Iskina Puso!
           <h2 className="text-2xl font-noto font-medium text-black mb-6">Choose Payment Method</h2>
 
           <div className="grid grid-cols-1 gap-4 mb-6">
-            {paymentMethods.map((method) => (
+            {allPaymentMethods.map((method) => (
               <button
                 key={method.id}
                 type="button"
@@ -356,14 +375,14 @@ Please confirm this order to proceed. Thank you for choosing Iskina Puso!
                   : 'border-iskina-green/30 bg-white text-gray-700 hover:border-iskina-green'
                   }`}
               >
-                <span className="text-2xl">💳</span>
+                <span className="text-2xl">{method.id === 'cod' ? '💵' : '💳'}</span>
                 <span className="font-medium">{method.name}</span>
               </button>
             ))}
           </div>
 
           {/* Payment Details with QR Code */}
-          {selectedPaymentMethod && (
+          {selectedPaymentMethod && selectedPaymentMethod.id !== 'cod' && (
             <div className="bg-iskina-green/5 rounded-lg p-6 mb-6 border border-iskina-green/20">
               <h3 className="font-medium text-black mb-4">Payment Details</h3>
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -371,7 +390,7 @@ Please confirm this order to proceed. Thank you for choosing Iskina Puso!
                   <p className="text-sm text-gray-600 mb-1">{selectedPaymentMethod.name}</p>
                   <p className="font-mono text-black font-medium">{selectedPaymentMethod.account_number}</p>
                   <p className="text-sm text-gray-600 mb-3">Account Name: {selectedPaymentMethod.account_name}</p>
-                  <p className="text-xl font-semibold text-black">Amount: ₱{totalPrice}</p>
+                  <p className="text-xl font-semibold text-black">Amount: ₱{finalTotal.toFixed(2)}</p>
                 </div>
                 <div className="flex-shrink-0">
                   <img
@@ -388,13 +407,22 @@ Please confirm this order to proceed. Thank you for choosing Iskina Puso!
             </div>
           )}
 
+          {selectedPaymentMethod && selectedPaymentMethod.id === 'cod' && (
+            <div className="bg-iskina-green/5 rounded-lg p-6 mb-6 border border-iskina-green/20">
+              <h3 className="font-medium text-black mb-2">Cash on Delivery</h3>
+              <p className="text-sm text-gray-700">Please prepare the exact amount of <span className="font-bold text-lg text-black">₱{finalTotal.toFixed(2)}</span> to pay upon {serviceType === 'pickup' ? 'pickup' : 'delivery'}.</p>
+            </div>
+          )}
+
           {/* Reference Number */}
-          <div className="bg-iskina-gold/10 border border-iskina-gold/30 rounded-lg p-4">
-            <h4 className="font-medium text-black mb-2">📸 Payment Proof Required</h4>
-            <p className="text-sm text-gray-700">
-              After making your payment, please take a screenshot of your payment receipt and attach it when you send your order via Messenger. This helps us verify and process your order quickly.
-            </p>
-          </div>
+          {paymentMethod !== 'cod' && (
+            <div className="bg-iskina-gold/10 border border-iskina-gold/30 rounded-lg p-4">
+              <h4 className="font-medium text-black mb-2">📸 Payment Proof Required</h4>
+              <p className="text-sm text-gray-700">
+                After making your payment, please take a screenshot of your payment receipt and attach it when you send your order via Messenger. This helps us verify and process your order quickly.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Order Summary */}
@@ -406,10 +434,10 @@ Please confirm this order to proceed. Thank you for choosing Iskina Puso!
               <h4 className="font-medium text-black mb-2">Customer Details</h4>
               <p className="text-sm text-gray-600">Name: {customerName}</p>
               <p className="text-sm text-gray-600">Contact: {contactNumber}</p>
-              {roomNumber && <p className="text-sm text-gray-600">Room: {roomNumber}</p>}
-              <p className="text-sm text-gray-600">Service: {serviceType === 'room-service' ? 'Room Service' : 'Pickup'}</p>
+              {roomNumber && <p className="text-sm text-gray-600">{serviceType === 'dine-in' ? 'Table' : 'Room'}: {roomNumber}</p>}
+              <p className="text-sm text-gray-600">Service: {serviceType === 'dine-in' ? 'Dine In' : serviceType === 'room-service' ? 'Room Service' : 'Pickup'}</p>
               <p className="text-sm text-gray-600">
-                {serviceType === 'room-service' ? 'Service Time' : 'Pickup Time'}: {pickupTime === 'custom' ? customTime : `${pickupTime} minutes`}
+                {serviceType === 'dine-in' ? 'Dining Time' : serviceType === 'room-service' ? 'Service Time' : 'Pickup Time'}: {pickupTime === 'custom' ? customTime : `${pickupTime} minutes`}
               </p>
             </div>
 
@@ -436,10 +464,20 @@ Please confirm this order to proceed. Thank you for choosing Iskina Puso!
             ))}
           </div>
 
-          <div className="border-t border-iskina-green/20 pt-4 mb-6">
+          <div className="border-t border-iskina-green/20 pt-4 mb-6 space-y-2">
+            <div className="flex items-center justify-between text-lg text-gray-600">
+              <span>Subtotal:</span>
+              <span>₱{totalPrice}</span>
+            </div>
+            {serviceCharge > 0 && (
+              <div className="flex items-center justify-between text-lg text-iskina-dark">
+                <span>Service Charge (5%):</span>
+                <span>₱{serviceCharge.toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex items-center justify-between text-2xl font-noto font-semibold text-black">
               <span>Total:</span>
-              <span>₱{totalPrice}</span>
+              <span>₱{finalTotal.toFixed(2)}</span>
             </div>
           </div>
 
