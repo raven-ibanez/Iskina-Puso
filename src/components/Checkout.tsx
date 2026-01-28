@@ -90,7 +90,7 @@ const Checkout: React.FC<CheckoutProps> = ({ cartItems, totalPrice, onBack, init
 
 👤 Customer: ${customerName}
 📞 Contact: ${contactNumber}
-${roomNumber ? `🏨 ${serviceType === 'dine-in' ? 'Table' : 'Room'}: ${roomNumber}` : ''}
+${roomNumber ? `🏨 Room: ${roomNumber}` : ''}
 📍 Service: ${serviceType === 'dine-in' ? 'Dine In' : serviceType === 'room-service' ? 'Room Service' : 'Pickup'}
 ⏰ Service Time: ${timeInfo}
 
@@ -236,14 +236,14 @@ Please confirm this order to proceed. Thank you for choosing Iskina Puso!
 
               <div>
                 <label className="block text-sm font-medium text-black mb-2">
-                  {serviceType === 'dine-in' ? 'Table Number *' : 'Room Number *'}
+                  Room Number *
                 </label>
                 <input
                   type="text"
                   value={roomNumber}
                   onChange={(e) => setRoomNumber(e.target.value)}
                   className="w-full px-4 py-3 border border-iskina-green/30 rounded-lg focus:ring-2 focus:ring-iskina-green focus:border-transparent transition-all duration-200"
-                  placeholder={serviceType === 'dine-in' ? "Enter table number" : "Enter room number"}
+                  placeholder="Enter room number"
                   required
                 />
               </div>
@@ -434,7 +434,7 @@ Please confirm this order to proceed. Thank you for choosing Iskina Puso!
               <h4 className="font-medium text-black mb-2">Customer Details</h4>
               <p className="text-sm text-gray-600">Name: {customerName}</p>
               <p className="text-sm text-gray-600">Contact: {contactNumber}</p>
-              {roomNumber && <p className="text-sm text-gray-600">{serviceType === 'dine-in' ? 'Table' : 'Room'}: {roomNumber}</p>}
+              {roomNumber && <p className="text-sm text-gray-600">Room: {roomNumber}</p>}
               <p className="text-sm text-gray-600">Service: {serviceType === 'dine-in' ? 'Dine In' : serviceType === 'room-service' ? 'Room Service' : 'Pickup'}</p>
               <p className="text-sm text-gray-600">
                 {serviceType === 'dine-in' ? 'Dining Time' : serviceType === 'room-service' ? 'Service Time' : 'Pickup Time'}: {pickupTime === 'custom' ? customTime : `${pickupTime} minutes`}
